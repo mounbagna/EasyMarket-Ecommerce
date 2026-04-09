@@ -95,7 +95,7 @@ const CartSidebarModal = () => {
             <div className="flex items-center justify-between gap-5 mb-6">
               <p className="font-medium text-xl text-dark">Subtotal:</p>
 
-              <p className="font-medium text-xl text-dark">${totalPrice}</p>
+              <p className="font-medium text-xl text-dark">{totalPrice} FCFA</p>
             </div>
 
             <div className="flex items-center gap-4">
@@ -108,6 +108,7 @@ const CartSidebarModal = () => {
               </Link>
 
               <Link
+                onClick={() => closeCartModal()}
                 href="/checkout"
                 className="w-full flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
               >

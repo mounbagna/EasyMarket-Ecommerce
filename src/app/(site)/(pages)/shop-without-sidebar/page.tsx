@@ -3,8 +3,7 @@ import ShopWithoutSidebar from "@/components/ShopWithoutSidebar";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "EasyMarket",
-  description: "This is Shop Page for EasyMarket",
-  // other metadata
+  description: "This is the Shop Page of EasyMarket",
 };
 
 const ShopWithoutSidebarPage = () => {

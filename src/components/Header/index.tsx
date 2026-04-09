@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 import { selectTotalPrice } from "@/redux/features/cart-slice";
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 import Image from "next/image";
-import logo from "../../assets/images/easymarket.png"
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,7 +50,7 @@ const Header = () => {
           <div className="xl:w-auto flex-col sm:flex-row w-full flex sm:justify-between sm:items-center gap-5 sm:gap-10">
             <Link className="flex-shrink-0" href="/">
               <Image
-                src={logo}
+                src="/images/logo/easymarket.png"
                 alt="Logo"
                 width={100}
                 height={30}

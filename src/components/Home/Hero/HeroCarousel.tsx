@@ -1,13 +1,6 @@
 "use client";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
-import pullover from "../../../assets/images/pullover.jpeg"
-import sarree from "../../../assets/images/sarree.png"
-import bag from "../../../assets/images/bag.jpeg"
-
-// Import Swiper styles
-import "swiper/css/pagination";
-import "swiper/css";
 
 import Image from "next/image";
 
@@ -49,7 +42,7 @@ const HeroCarousal = () => {
             </p>
 
             <a
-              href="#"
+              href="/shop-without-sidebar"
               className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
             >
               Shop Now
@@ -58,7 +51,7 @@ const HeroCarousal = () => {
 
           <div>
             <Image
-              src={pullover}
+              src="/images/products/pullover.jpeg"
               alt="pullover"
               width={351}
               height={358}
@@ -90,7 +83,7 @@ const HeroCarousal = () => {
             </p>
 
             <a
-              href="#"
+              href="/shop-without-sidebar"
               className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
             >
               Shop Now
@@ -99,7 +92,7 @@ const HeroCarousal = () => {
 
           <div>
             <Image
-              src={bag}
+              src="/images/products/bag.jpeg"
               alt="bag"
               width={351}
               height={358}
@@ -131,7 +124,7 @@ const HeroCarousal = () => {
             </p>
 
             <a
-              href="#"
+              href="/shop-without-sidebar"
               className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
             >
               Shop Now
@@ -140,7 +133,7 @@ const HeroCarousal = () => {
 
           <div>
             <Image
-              src={sarree}
+              src="/images/products/sarree.png"
               alt="sarree"
               width={351}
               height={358}

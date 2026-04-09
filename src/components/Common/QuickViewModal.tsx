@@ -6,12 +6,10 @@ import { AppDispatch, useAppSelector } from "@/redux/store";
 import { addItemToCart } from "@/redux/features/cart-slice";
 import { useDispatch } from "react-redux";
 import Image from "next/image";
-import { usePreviewSlider } from "@/app/context/PreviewSliderContext";
 import { updateproductDetails } from "@/redux/features/product-details";
 
 const QuickViewModal = () => {
   const { isModalOpen, closeModal } = useModalContext();
-  const { openPreviewModal } = usePreviewSlider();
   const [quantity, setQuantity] = useState(1);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -25,7 +23,6 @@ const QuickViewModal = () => {
   const handlePreviewSlider = () => {
     dispatch(updateproductDetails(product));
 
-    openPreviewModal();
   };
 
   // add to cart
