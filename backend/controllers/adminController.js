@@ -4,17 +4,16 @@ import jwt from "jsonwebtoken";
 import transporter from "../config/mail.js";
 
 //ADMIN LOGIN
-export const adminLogin = (req,res) => {
+export const adminLogin = async (req,res) => {
     const {email,password} = req.body;
 
-    db.query(
-        "SELECT * FROM admin WHERE email = ?", [email], async (err, result) =>{
-            if (err) return res.status(500).json(err);
-            if (result.length === 0) {
+    try {
+        const result = await  db.query("SELECT * FROM admin WHERE email = $1", [email]);
+        if (result.rows.length === 0) {
                 return res.status(401).json({message: "Invalid Credentials"});
             }
-
-            const admin = result[0];
+        
+        const admin = result.rows[0];
             const valid = await bcrypt.compare(password,admin.password);
             if(!valid){
                 return res.status(401).json({message:"Invalid Credentials"});
@@ -37,81 +36,74 @@ export const adminLogin = (req,res) => {
                     lastname: admin.lastname,
                 },
             });
-        }
-    )
+    }catch(err){
+        console.error("Admin login error:", err);
+        res.status(500).json({message: "server error"});
+}
 }
 
 //GET PENDING SHOPS
-export const getPendingShops = (req,res) => {
-    const sql = `SELECT * FROM shopowners WHERE status='pending' ORDER BY created_at DESC`;
-
-    db.query(sql,(err,result)=>{
-        if(err){
-            return res.status(500).json(err);
-        }
-        res.json(result);
-    })
+export const getPendingShops = async (req,res) => {
+    try {
+        const result = await db.query(`SELECT * FROM shopowners WHERE status='pending' ORDER BY created_at DESC`);
+        res.json(result.rows);
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 }
 
 //GET ACTIVE SHOPS
-export const getActiveShops = (req,res) => {
-    const sql = `SELECT * FROM shopowners WHERE status='active' ORDER BY created_at DESC`;
-
-    db.query(sql,(err,result)=>{
-        if(err){
-            return res.status(500).json(err);
-        }
-        res.json(result);
-    })
+export const getActiveShops = async (req,res) => {
+    try {
+        const result = await db.query(`SELECT * FROM shopowners WHERE status='active' ORDER BY created_at DESC`);
+        res.json(result.rows);
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 }
 
 //GET SUSPENDED SHOPS
-export const getSuspendedShops = (req,res) => {
-    const sql = `SELECT * FROM shopowners WHERE status='suspended' ORDER BY created_at DESC`;
-
-    db.query(sql,(err,result)=>{
-        if(err){
-            return res.status(500).json(err);
-        }
-        res.json(result);
-    })
+export const getSuspendedShops = async (req,res) => {
+     try {
+        const result = await db.query("SELECT * FROM shopowners WHERE status='suspended' ORDER BY created_at DESC");
+        res.json(result.rows);
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 }
 
 //GET REGISTERED CUSTOMERS
-export const getCustomers = (req,res) => {
-    const sql = `SELECT * FROM customers`;
-
-    db.query(sql,(err,result)=>{
-        if(err){
-            return res.status(500).json(err);
-        }
-        res.json(result);
-    })
+export const getCustomers = async (req,res) => {
+    try {
+        const result = await db.query("SELECT * FROM customers");
+        res.json(result.rows);
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 }
 
 //GET ALL SHOP OWNERS 
-export const getShopOwners = (req,res) => {
-    const sql = `SELECT * FROM shopowners`;
-
-    db.query(sql,(err,result)=>{
-        if(err){
-            return res.status(500).json(err);
-        }
-        res.json(result);
-    })
+export const getShopOwners = async (req,res) => {
+    try {
+        const result = await db.query("SELECT * FROM shopowners");
+        res.json(result.rows);
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 }
 
 //GET ALL PRODUCTS 
-export const getProducts = (req, res) => {
-    db.query("SELECT * FROM products", (err, results) => {
-    if (err){
-      console.error(err)
-      return res.status(500).json(err);
-    } 
-
-    const formatted = results.map((p) => {
+export const getProducts = async (req, res) => {
+    try {
+        const result = await db.query("SELECT * FROM products"); 
+        const formatted = results.rows.map((p) => {
       let preview = [];
-      let thumbnail = null;
+      let thumbnail = [];
 
       try {
         thumbnail = JSON.parse(p.thumbnail || "[]");
@@ -125,73 +117,67 @@ export const getProducts = (req, res) => {
       }
       return {...p, thumbnail, preview};
     });
-
     res.json(formatted);
-  });
+    } catch(error) {
+        console.error(error)
+        res.status(500).json(error);
+    }
 }
 
 // SUSPEND A SHOP
-export const suspendShopOwner = (req, res) => {
+export const suspendShopOwner = async (req, res) => {
     const {id} = req.params;
 
-    const sql = `UPDATE shopowners SET status='suspended' WHERE id = ?`;
-
-    db.query(sql,[id],(err, result) => {
-        if(err){
-            return res.status(500).json(err)
-        }
- 
+    try {
+        await db.query("UPDATE shopowners SET status='suspended' WHERE id = $1",[id]);
         res.json({message:"Shop suspended successfully"});
-    });
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 };
 
 // REACTIVATE A SHOP
-export const reactivateShopOwner = (req, res) => {
+export const reactivateShopOwner = async (req, res) => {
     const {id} = req.params;
 
-    const sql = `UPDATE shopowners SET status='active' WHERE id = ?`;
-
-    db.query(sql,[id],(err, result) => {
-        if(err){
-            return res.status(500).json(err)
-        }
- 
+    try {
+        await db.query("UPDATE shopowners SET status='active' WHERE id = $1",[id]);
         res.json({message:"Shop reactivated successfully"});
-    });
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 };
 
 // DELETE A SHOP
-export const deleteShopOwner = (req, res) => {
+export const deleteShopOwner = async (req, res) => {
     const {id} = req.params;
 
-    const sql = `DELETE FROM shopowners WHERE id = ?`;
-
-    db.query(sql,[id],(err, result) => {
-        if(err){
-            return res.status(500).json(err)
-        }
- 
+    try {
+        await db.query("DELETE FROM shopowners WHERE id = $1",[id]);
         res.json({message:"Shop deleted successfully"});
-    });
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 };
 
 // DELETE A PRODUCT
-export const deleteProduct = (req, res) => {
+export const deleteProduct = async (req, res) => {
     const {id} = req.params;
 
-    const sql = `DELETE FROM products WHERE id = ?`;
-
-    db.query(sql,[id],(err, result) => {
-        if(err){
-            return res.status(500).json(err)
-        }
- 
-        res.json({message:"Shop deleted successfully"});
-    });
+    try {
+        await db.query("DELETE FROM products WHERE id = $1",[id]);
+        res.json({message:"Product deleted successfully"});
+    } catch(error){
+        console.log(error)
+        res.status(500).json(error);
+    }
 };
 
 //GET DASHBOARD STATISTICS
-export const getDashboardStats = (req,res) => {
+export const getDashboardStats = async (req,res) => {
     const sql = `
     SELECT
     ( SELECT COUNT(*) FROM shopowners WHERE status='pending' ) AS pendingShops,
@@ -201,57 +187,57 @@ export const getDashboardStats = (req,res) => {
     ( SELECT COUNT(*) FROM customers ) AS customers
     `;
 
-    db.query(sql,(err,result) => {
-        if(err){
-            console.log(err);
-            return res.status(500).json({message: "Database error"});
-        }
-        res.json(result[0]);
-    });
+    try {
+        const result = await db.query(sql);
+        res.json(result.rows[0]);
+    } catch(error) {
+        console.log(error)
+        res.status(500).json(error);
+    }
 };
 
 
 //ACTIVATE A SHOP OWNER'S ACCOUNT
-export const activateShopOwner = (req,res) => {
+export const activateShopOwner = async (req,res) => {
     const {id} = req.params;
 
-    const sql = `
-    UPDATE shopowners SET status='active',registration_paid=1,monthly_paid_until=DATE_ADD(CURDATE(), INTERVAL 30 DAY) WHERE id=?`;
-
-    db.query(sql,[id],(err, result) =>{
-
-            if (err) return res.status(500).json(err);
-            if (result.affectedRows === 0) {
-                return res.status(404).json({message: "Shopowner not found"});
-            }   
+    try {
+        const updateResult = await db.query(`
+            UPDATE shopowners 
+            SET 
+               status='active',
+               registration_paid=true,
+               monthly_paid_until = CURRENT_DATE + INTERVAL '30 days'
+            WHERE id = $1
+            RETURNING *
+            `,[id]);
             
-            //get owner email
-            db.query("SELECT * FROM shopowners WHERE id=?",[id],(err, owners) =>{
-            if (err) return res.status(500).json(err);
+        if (updateResult.rows.length === 0) {return res.status(404).json({message: "Shopowner not found"});}   
+        
+        const owner = updateResult.rows[0];         
             
-            const owner=owners[0]
-
-            //send email
+            //send Activation email
             transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: owner.email,
                 subject: "EasyMarket shop activated",
-                
-                html:
-        `
-        <h2>Hello ${owner.firstname}</h2>
-        <p>Your payment has been verified.</p>
-        <p>Your shop <b>${owner.shop_name}</b> is now active.</p>
-        <p>You can now login and manage your shop.</p>
-        `
+                html: `
+                    <h2>Hello ${owner.firstname}</h2>
+                    <p>Your payment has been verified.</p>
+                    <p>Your shop <b>${owner.shop_name}</b> is now active.</p>
+                    <p>You can now login and manage your shop.</p>
+                `
             },(error,info)=>{
                 if(error){
                     console.log("email error",error);
                     return res.status(500).json({message:"shop activated but email failed"})
-                }else{
-                    console.log("activation email sent:",info.response)
                 }
-            });
-                });   
-        })
+                    console.log("activation email sent:",info.response);
+                }
+            );
+            res.json({message:"shop activated successfully"});
+        } catch(err) {
+            console.error(err)
+            res.status(500).json(err);
+    }
 }

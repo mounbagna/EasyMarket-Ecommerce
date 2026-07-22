@@ -32,7 +32,7 @@ const ShopOwnerList = () => {
                     </div>
 
                     <div className="min-w-[200px]">
-                      <p className="text-dark">Registration Paid</p>
+                      <p className="text-dark">Registration Fee</p>
                     </div>
 
                     <div className="min-w-[200px]">

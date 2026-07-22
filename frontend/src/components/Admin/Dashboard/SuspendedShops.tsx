@@ -12,7 +12,7 @@ const SuspendedShops = () => {
     },[]);
 
     if(!stats){return <p>Loading...</p>}
-    const card={title:"Suspended Shops",value:stats.suspendedShops};
+    const card={title:"Suspended Shops",value:stats.suspendedshops};
 
   return (
     <div>

@@ -10,7 +10,7 @@ const CartPage = () => {
   return (
     <>
       <Cart />
-    </>
+    </> 
   );
 };
 

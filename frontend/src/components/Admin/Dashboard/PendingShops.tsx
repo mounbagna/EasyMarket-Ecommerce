@@ -12,7 +12,7 @@ const PendingShops = () => {
     },[]);
 
     if(!stats){return <p>Loading...</p>}
-    const card={title:"Pending Shops",value:stats.pendingShops};
+    const card={title:"Pending Shops",value:stats.pendingshops};
 
   return (
     <div>

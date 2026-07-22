@@ -8,11 +8,14 @@ const ActiveShops = () => {
   const [stats, setStats] = useState<any>(null);
 
     useEffect(()=>{
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/dashboard`).then(res=>res.json()).then(data=>{setStats(data);})
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/dashboard`)
+        .then(res=>res.json())
+        .then(data=>{setStats(data);})
+        .catch((err)=>console.error(err))
     },[]);
 
     if(!stats){return <p>Loading...</p>}
-    const card={title:"Active Shops",value:stats.activeShops};
+    const card={title:"Active Shops",value:stats.activeshops};
 
   return (
     <div>

@@ -26,7 +26,7 @@ const EditItemModal = ({product}:Props) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState(product.category_id?.toString() || "");
   const [location, setLocation] = useState(product.location || "");
-  const [conditionType, setConditionType] = useState(product.condition_type);
+  const [conditionType, setConditionType] = useState(product.condition_type || "New");
   const [thumbnail, setThumbnail] = useState<File[]>([]);
   const [preview, setPreview] = useState<File[]>([]); 
 
@@ -42,7 +42,7 @@ const EditItemModal = ({product}:Props) => {
     formData.append("description", description);
     formData.append("category_id", categoryId);
     formData.append("location", location);
-    formData.append("conditionType", conditionType);
+    formData.append("condition_type", conditionType);
 
     thumbnail.forEach((file) => {
       formData.append("thumbnail", file);

@@ -1,266 +1,568 @@
 import db from "../config/db.js";
 
+const formatProduct = (products) => {
+
+    return products.map((p) => {
+
+        let preview = [];
+        let thumbnail = [];
+
+        try {
+            thumbnail = JSON.parse(p.thumbnail || "[]");
+        } catch {
+            thumbnail = [];
+        }
+
+
+        try {
+            preview = JSON.parse(p.preview || "[]");
+        } catch {
+            preview = [];
+        }
+
+
+        return {
+            ...p,
+            thumbnail,
+            preview
+        };
+
+    });
+
+};
+
 /* GET ALL PRODUCTS */
-export const getProducts = (req, res) => {
-    db.query("SELECT * FROM products", (err, results) => {
-    if (err){
-      console.error(err)
-      return res.status(500).json(err);
-    } 
+export const getProducts = async (req, res) => {
 
-    const formatted = results.map((p) => {
-      let preview = [];
-      let thumbnail = null;
+    try {
 
-      try {
-        thumbnail = JSON.parse(p.thumbnail || "[]");
-      } catch (e) {
-        thumbnail = [];
-      }
-       try {
-        preview = JSON.parse(p.preview || "[]");
-      } catch (e) {
-        preview = [];
-      }
-      return {...p, thumbnail, preview};
-    });
+        const result = await db.query(
+            "SELECT * FROM products"
+        );
 
-    res.json(formatted);
-  });
-}
 
-/* GET SECOND PRODUCTS */
-export const getSecondHandProducts = async(req, res) => {
-  try {
-    const sql = `SELECT * FROM products WHERE condition_type = 'second_hand'`
+        res.json(
+            formatProduct(result.rows)
+        );
 
-     db.query(sql, (err, results) => {
-    if (err){
-      console.error(err)
-      return res.status(500).json(err);
-    } 
-    const formatted = results.map((p) => {
-      let preview = [];
-      let thumbnail = null;
 
-      try {
-        thumbnail = JSON.parse(p.thumbnail || "[]");
-      } catch (e) {
-        thumbnail = [];
-      }
-       try {
-        preview = JSON.parse(p.preview || "[]");
-      } catch (e) {
-        preview = [];
-      }
-      return {...p, thumbnail, preview};
-    });
-    res.json(formatted);
-    
-    });
-  } catch(error){
-    res.status(500).json({error: error.message})
-  }
-  }
+    } catch (error) {
 
-/* GET PRODUCTS OF ONE SHOP OWNER*/
-export const getProductsByShopOwner = (req, res) => {
-    const {id} = req.params;
+        console.error(error);
 
-  const sql = "SELECT * FROM products WHERE shopowner_id = ?";
+        res.status(500).json({
+            error:"Database error"
+        });
 
-  db.query(sql, [id], (err, results) => {
-    if (err){
-      console.error(err)
-      return res.status(500).json(err);
-    } 
+    }
 
-    const products = results.map((product) => ({
-      ...product, 
-      thumbnail: JSON.parse(product.thumbnail || "[]"), 
-      preview: JSON.parse(product.preview || "[]")
-    }));
-    res.json(products);
-  }
-  );
-}
+};
 
-/* GET PRODUCTS BY CATEGORY */
-export const getProductsByCategory = (req, res) => {
-    const {id} = req.params;
+/* GET SECOND HAND PRODUCTS */
+export const getSecondHandProducts = async (req, res) => {
 
-  const sql = "SELECT products.*,categories.name AS category_name FROM products JOIN categories ON products.category_id=categories.id WHERE category_id = ?";
+    try {
 
-  db.query(sql, [id], (err, results) => {
-    if (err){
-      return res.status(500).json(err);
-    } 
+        const result = await db.query(
+            `
+            SELECT * 
+            FROM products 
+            WHERE condition_type = 'second_hand'
+            `
+        );
 
-    const products = results.map((product) => ({
-      ...product, 
-      thumbnail: JSON.parse(product.thumbnail || "[]"), 
-      preview: JSON.parse(product.preview || "[]")
-    }));
-    res.json(products);
-  }
-  );
-}
 
+        res.json(
+            formatProduct(result.rows)
+        );
+
+
+    } catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:error.message
+        });
+
+    }
+
+};
+
+
+/* GET PRODUCTS OF ONE SHOP OWNER */
+export const getProductsByShopOwner = async (req, res) => {
+
+    const { id } = req.params;
+
+
+    try {
+
+        const result = await db.query(
+            "SELECT * FROM products WHERE shopowner_id = $1",
+            [id]
+        );
+
+
+        res.json(
+            formatProduct(result.rows)
+        );
+
+
+    } catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:"Database error"
+        });
+
+    }
+
+};
+
+//* GET PRODUCTS BY CATEGORY */
+export const getProductsByCategory = async (req, res) => {
+
+    const { id } = req.params;
+
+
+    try {
+
+        const result = await db.query(
+            `
+            SELECT 
+                products.*,
+                categories.name AS category_name
+
+            FROM products
+
+            JOIN categories 
+            ON products.category_id = categories.id
+
+            WHERE products.category_id = $1
+            `,
+            [id]
+        );
+
+
+        res.json(
+            formatProduct(result.rows)
+        );
+
+
+    } catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:"Database error"
+        });
+
+    }
+
+};
 /* ---------------- CREATE PRODUCT API ---------------- */
-export const addProduct = (req, res) => {
+
+export const addProduct = async (req, res) => {
+
     try {
-      const shopowner_id = req.user.id;
-      
-      const {title, price,discountedPrice,quantity,description,category_id,location,condition_type} = req.body;
-      
-      const thumbnailFiles = req.files?.thumbnail || [];
-      const previewFiles = req.files?.preview || [];
-      
-      const thumbnailUrls = thumbnailFiles.map((file) => `/uploads/${file.filename}`);
-      const previewUrls = previewFiles.map((file) => `/uploads/${file.filename}`);
-      
-      const safeThumbnail = JSON.stringify(thumbnailUrls);
-      const safePreview = JSON.stringify(previewUrls);
-      console.log("body",req.body)
-      const sql=`INSERT INTO products(title,price,discounted_price,quantity,description,thumbnail,preview,shopowner_id,category_id,location, condition_type)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    db.query(
-      sql,
-      [title,Number(price),Number(discountedPrice),Number(quantity),description,safeThumbnail,safePreview,shopowner_id,category_id,location,condition_type],
-      (err, result) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: "Database error" });
-        }
 
-        return res.status(201).json({
-          message: "Product created successfully",
-          id: result.insertId,
+        const shopowner_id = req.user.id;
+
+
+        const {
+            title,
+            price,
+            discountedPrice,
+            quantity,
+            description,
+            category_id,
+            location,
+            condition_type
+        } = req.body;
+
+
+        const thumbnailFiles = req.files?.thumbnail || [];
+
+        const previewFiles = req.files?.preview || [];
+
+
+        const thumbnailUrls = thumbnailFiles.map(
+            file => `/uploads/${file.filename}`
+        );
+
+
+        const previewUrls = previewFiles.map(
+            file => `/uploads/${file.filename}`
+        );
+
+
+        const safeThumbnail = JSON.stringify(thumbnailUrls);
+
+        const safePreview = JSON.stringify(previewUrls);
+
+
+
+        const result = await db.query(
+
+            `
+            INSERT INTO products
+            (
+                title,
+                price,
+                discounted_price,
+                quantity,
+                description,
+                thumbnail,
+                preview,
+                shopowner_id,
+                category_id,
+                location,
+                condition_type
+            )
+
+            VALUES
+            (
+                $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
+            )
+
+            RETURNING id
+            `,
+
+            [
+                title,
+                Number(price),
+                Number(discountedPrice),
+                Number(quantity),
+                description,
+                safeThumbnail,
+                safePreview,
+                shopowner_id,
+                category_id,
+                location,
+                condition_type
+            ]
+
+        );
+
+
+        res.status(201).json({
+
+            message:"Product created successfully",
+
+            id: result.rows[0].id
+
         });
-      }
-    );
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({error: "server error"});
-  }
-  }
 
-  /* ---------------- DELETE PRODUCT API ---------------- */
-  export const deleteProduct = (req, res) => {
-    try {
-      const productId = req.params.id;
-      const shopownerId = req.user.id;
-      const sql = `DELETE FROM products WHERE id = ?`;
 
-    db.query(
-      sql,
-      [productId,shopownerId],
-      (err, result) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: "Database error" });
-        }
-        if(result.affectedRows===0){
-          return res.status(404).json({error:"Product not found"})
-        }
 
-        return res.status(201).json({
-          message: "Product deleted successfully",
+    } catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:"Server error"
         });
-      }
-    );
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({error: "server error"});
-  }
-  }
+
+    }
+
+};
+/* ---------------- DELETE PRODUCT API ---------------- */
+
+export const deleteProduct = async (req,res)=>{
+
+    try{
+
+        const {id} = req.params;
+
+
+        const result = await db.query(
+
+            `
+            DELETE FROM products
+            WHERE id=$1
+            RETURNING id
+            `,
+
+            [id]
+
+        );
+
+
+        if(result.rows.length===0){
+
+            return res.status(404).json({
+                error:"Product not found"
+            });
+
+        }
+
+
+        res.json({
+
+            message:"Product deleted successfully"
+
+        });
+
+
+
+    }catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:"Server error"
+        });
+
+    }
+
+};
 
   /* ---------------- UPDATE PRODUCT API ---------------- */
-export const updateProduct = async(req, res) => {
-      const {id} = req.params;      
-      const {title, price,discountedPrice,quantity,description,category_id,location,condition_type} = req.body;
-      db.query("SELECT * FROM products WHERE id=?",[id],
-        (err , rows)=>{
-          if(err){console.log(err);
-            return res.status(500).json({error:"db error"})
-          }
-          if(rows.length===0){
-          return res.status(404).json({
-            error:"Product not found"
-          })
+
+export const updateProduct = async(req,res)=>{
+
+    try{
+
+        const {id}=req.params;
+
+
+        const {
+            title,
+            price,
+            discountedPrice,
+            quantity,
+            description,
+            category_id,
+            location,
+            condition_type
+        }=req.body;
+
+
+
+        const oldProduct = await db.query(
+
+            "SELECT * FROM products WHERE id=$1",
+
+            [id]
+
+        );
+
+
+        if(oldProduct.rows.length===0){
+
+            return res.status(404).json({
+                error:"Product not found"
+            });
+
         }
-      let thumbnail = rows[0].thumbnail;
-      let preview = rows[0].preview;
-      if(req.files?.thumbnail){
-        thumbnail = JSON.stringify(
-          req.files.thumbnail.map(file=>`/uploads/${file.filename}`)
-        )
-      }
-      if(req.files?.preview){
-        preview = JSON.stringify(
-          req.files.preview.map(file=>`/uploads/${file.filename}`)
-        )
-      }
-      const sql=`UPDATE products SET title=?,price=?,discounted_price=?,quantity=?,description=?,thumbnail=?,preview=?,category_id=?,location=?,condition_type=?
-                 WHERE id=?`;
-    db.query(
-      sql,
-      [title,Number(price),Number(discountedPrice),Number(quantity),description,thumbnail,preview,category_id,location,condition_type,id],
-      (err, result)=>{
-        if(err){console.log("update error",err);
-            return res.status(500).json({error:"db error"})
-          }
-      if(result.affectedRows===0){
-          return res.status(404).json({
-            error:"Product not found"
-          })
+
+
+
+        let thumbnail = oldProduct.rows[0].thumbnail;
+
+        let preview = oldProduct.rows[0].preview;
+
+
+
+        if(req.files?.thumbnail){
+
+            thumbnail = JSON.stringify(
+
+                req.files.thumbnail.map(
+                    file=>`/uploads/${file.filename}`
+                )
+
+            );
+
         }
-        return res.status(200).json({
-          message: "Product updated successfully",
+
+
+
+        if(req.files?.preview){
+
+            preview = JSON.stringify(
+
+                req.files.preview.map(
+                    file=>`/uploads/${file.filename}`
+                )
+
+            );
+
+        }
+
+
+
+        const result = await db.query(
+
+            `
+            UPDATE products
+
+            SET
+            title=$1,
+            price=$2,
+            discounted_price=$3,
+            quantity=$4,
+            description=$5,
+            thumbnail=$6,
+            preview=$7,
+            category_id=$8,
+            location=$9,
+            condition_type=$10
+
+            WHERE id=$11
+
+            RETURNING id
+            `,
+
+
+            [
+
+                title,
+                Number(price),
+                Number(discountedPrice),
+                Number(quantity),
+                description,
+                thumbnail,
+                preview,
+                category_id,
+                location,
+                condition_type,
+                id
+
+            ]
+
+        );
+
+
+
+        res.json({
+
+            message:"Product updated successfully",
+
+            id:result.rows[0].id
+
         });
-      } 
-    );
+
+
+
+    }catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:"Server error"
+        });
+
     }
-);    
-  }
 
-  //NEW ARRIVALS
-  export const getNewArrivals = (req, res) => {
-    
-    const sql = `SELECT * FROM products ORDER BY created_at DESC LIMIT 3`;
+};
 
-  db.query(sql, (err, results) => {
-    if (err){
-      console.error(err)
-      return res.status(500).json(err);
-    } 
-    const formatted = results.map((p) => {
-      return {
-      ...p, 
-      thumbnail: JSON.parse(p.thumbnail || "[]"), 
-      preview: JSON.parse(p.preview || "[]")
+  // NEW ARRIVALS
+
+export const getNewArrivals = async(req,res)=>{
+
+
+    try{
+
+
+        const result = await db.query(
+
+            `
+            SELECT *
+            FROM products
+            ORDER BY created_at DESC
+            LIMIT 3
+            `
+
+        );
+
+
+        res.json(
+            formatProduct(result.rows)
+        );
+
+
+
+    }catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:"Database error"
+        });
+
     }
-  });
-    res.json(formatted);
-  }
-  );
-}
 
-export const searchProducts = (req, res) => {
-  const {q} = req.query;
+};
 
-  const sql = `
-  SELECT p.*, c.name AS category_name, s.shop_name FROM products p LEFT JOIN categories c ON p.category_id = c.id 
-  LEFT JOIN shopowners s ON p.shopowner_id = s.id WHERE p.title LIKE ? OR c.name LIKE ? OR s.shop_name LIKE ?
-  OR p.location LIKE ?
-  `;
+//SEARCH PRODUCTS
+export const searchProducts = async(req,res)=>{
 
-  const search = `%${q}`;
 
-  db.query(sql,[search,search,search,search],(err,results) => {
-    if(err){
-      return res.status(500).json(err);
+    try{
+
+
+        const {q}=req.query;
+
+
+        const search=`%${q}%`;
+
+
+
+        const result = await db.query(
+
+            `
+            SELECT 
+                p.*,
+                c.name AS category_name,
+                s.shop_name
+
+            FROM products p
+
+
+            LEFT JOIN categories c
+
+            ON p.category_id=c.id
+
+
+            LEFT JOIN shopowners s
+
+            ON p.shopowner_id=s.id
+
+
+            WHERE 
+            p.title ILIKE $1
+
+            OR c.name ILIKE $1
+
+            OR s.shop_name ILIKE $1
+
+            OR p.location ILIKE $1
+
+            `,
+
+            [search]
+
+        );
+
+
+
+        res.json(
+            formatProduct(result.rows)
+        );
+
+
+
+    }catch(error){
+
+        console.error(error);
+
+        res.status(500).json({
+            error:"Database error"
+        });
+
     }
-    res.json(results);
-  })
-}
+
+};

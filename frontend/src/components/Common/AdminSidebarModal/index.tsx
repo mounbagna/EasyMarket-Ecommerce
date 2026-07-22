@@ -34,11 +34,6 @@ const menu = [
         Link:"/admin/dashboard/products"
     },
     {
-        title:"Orders",
-        icon:ShoppingCart,
-        Link:"/admin/dashboard"
-    },
-    {
         title:"Shop Owners",
         icon:Users,
         Link:"/admin/dashboard/shopowners"
@@ -47,16 +42,6 @@ const menu = [
         title:"Customers",
         icon:Users,
         Link:"/admin/dashboard/customers"
-    },
-    {
-        title:"Payments",
-        icon:CreditCard,
-        Link:"/admin/dashboard"
-    },
-    {
-        title:"Settings",
-        icon:Settings,
-        Link:"/admin/dashboard"
     },
 ];
 
