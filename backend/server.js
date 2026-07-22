@@ -14,8 +14,10 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({origin: ["http://localhost:3000",
-  "https://easymarket-13yu1rxj7-mounbagnas-projects.vercel.app/"], 
+app.use(cors({origin: [
+  "https://easymarket-13yu1rxj7-mounbagnas-projects.vercel.app",
+  "easymarket-git-main-mounbagnas-projects.vercel.app",
+  "easymarket-tau.vercel.app"], 
   methods: ["GET", "POST", "PUT", "DELETE"], credentials: true})); //CORS FIX
 app.use(express.json({limit: "50mb"})); //BODY PARSER
 app.use(express.urlencoded({extended:true,limit: "50mb"})) //Form requests (optional)
