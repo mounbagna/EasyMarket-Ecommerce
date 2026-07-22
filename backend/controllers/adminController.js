@@ -101,7 +101,7 @@ export const getShopOwners = async (req,res) => {
 export const getProducts = async (req, res) => {
     try {
         const result = await db.query("SELECT * FROM products"); 
-        const formatted = results.rows.map((p) => {
+        const formatted = result.rows.map((p) => {
       let preview = [];
       let thumbnail = [];
 
