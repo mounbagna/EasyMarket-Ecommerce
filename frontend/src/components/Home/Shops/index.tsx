@@ -27,7 +27,7 @@ const ShopOwners = () => {
   useEffect(() => {
     const fetchShopOwners = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop`);
+        const res = await fetch("https://easymarket-backend.onrender.com/shop");
         if (!res.ok) throw new Error("Server error");
         const data = await res.json();
         

@@ -29,7 +29,7 @@ const ShopOwnerContent = ({shopOwnerId}: Props) => {
   
   const fetchProducts = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop/${shopOwnerId}/products`,);
+      const res = await fetch("https://easymarket-backend.onrender.com/shop/${shopOwnerId}/products",);
       if (!res.ok) throw new Error("Server error");
 
       const data = await res.json();

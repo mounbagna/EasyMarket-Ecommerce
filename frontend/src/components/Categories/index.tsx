@@ -27,7 +27,7 @@ const Categories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`)
+        const res = await fetch("https://easymarket-backend.onrender.com/categories")
         const data = await res.json()
         setCategories(data)
       } catch(error) {

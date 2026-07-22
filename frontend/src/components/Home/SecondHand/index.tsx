@@ -16,7 +16,7 @@ const SecondHand = () => {
   useEffect(() => {
     const fetchNewArrivals = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/second-hand`);
+        const res = await fetch("https://easymarket-backend.onrender.com/products/second-hand");
         if(!res.ok){
           throw new Error("Failed to fetch");
         }
