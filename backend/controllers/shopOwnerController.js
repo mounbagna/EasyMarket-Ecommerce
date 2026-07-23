@@ -30,7 +30,6 @@ export const getShopOwners = async (req, res) => {
                 image,
                 category_name: shop.category_name
             };
-
         });
         res.json(formatted);
     } catch(error) {
@@ -38,9 +37,7 @@ export const getShopOwners = async (req, res) => {
         res.status(500).json({
             error:"Database error"
         });
-
     }
-
 };
 
 
