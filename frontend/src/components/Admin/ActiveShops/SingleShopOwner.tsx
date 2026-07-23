@@ -8,7 +8,7 @@ const SingleShopOwner = () => {
 
     const loadShops =()=>{
         const token = localStorage.getItem("token");
-        fetch("https://easymarket-backend.onrender.com/admin/active-shops",{
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/active-shops`,{
             headers:{
                 Authorization: `Bearer ${token}`,
             },

@@ -5,24 +5,28 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const db = new Pool({
-  /*host: process.env.DB_HOST,
+const db = new Pool(
+  process.env.DATABASE_URL ? {
+    connectionString: process.env.DATABASE_URL,
+    ssl:{
+    rejectUnauthorized:false
+  },
+  } : {
+  host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.Db_PORT*/
-  connectionString: process.env.DATABASE_URL,
-  ssl:{
-    rejectUnauthorized:false
-  }
+  port: process.env.Db_PORT,
 });
 
-db.connect((err) => {
+db.connect((err, client, release) => {
   if(err){
-    console.log("Database connection failed");
-    return;
+    console.log("Database connection failed", err.message);
+  } else {
+    console.log("Database connected");
+    release();
   }
-  console.log("Database connected");
+  
 })
 
 export default db;

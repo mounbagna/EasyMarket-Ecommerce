@@ -15,7 +15,7 @@ const ListOfItemsByCategory = ({categoryId}:{categoryId:number}) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("https://easymarket-backend.onrender.com/products/category/${categoryId}") 
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/category/${categoryId}`) 
         const text = await res.text();
         if (!res.ok) throw new Error("Server error");
     

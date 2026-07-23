@@ -20,7 +20,7 @@ const ListOfItems = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("https://easymarket-backend.onrender.com/products");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`);
   
         if (!res.ok) throw new Error("Server error");
   

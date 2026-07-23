@@ -7,6 +7,7 @@ import { selectTotalPrice } from "@/redux/features/cart-slice";
 import { useCartModalContext } from "@/context/CartSidebarModalContext";
 import { useLoginModalContext } from "@/context/LoginModalContext";
 import { useSignupModalContext } from "@/context/SignupModalContext";
+import { LogIn, LogOut, Store } from "lucide-react";
 
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ const Header = () => {
   const { openSignupModal } = useSignupModalContext();
 
   const [navigationOpen, setNavigationOpen] = useState(false);
-  const [stickyMenu, setStickyMenu] = useState(false);
+ // const [stickyMenu, setStickyMenu] = useState(false);
   const { openCartModal } = useCartModalContext();
 
   const product = useAppSelector((state) => state.cartReducer.items);
@@ -34,35 +35,34 @@ const Header = () => {
   };
 
   // Sticky menu
-  const handleStickyMenu = () => {
+  /*const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
       setStickyMenu(true);
     } else {
       setStickyMenu(false);
     }
-  };
+  };*/
 
   const handleSearch = () => {
     if(!searchInput.trim()) return;
     setSearch(searchInput)
     router.push(`/search?q=${encodeURIComponent(searchInput)}`)
   }
-  useEffect(() => {
-    window.addEventListener("scroll", handleStickyMenu);
-  });
-
+  //useEffect(() => {window.addEventListener("scroll", handleStickyMenu);});
+const stickyHeader = "";
+//const stickyHeader = stickyMenu ? "py-4" : "py-6";
+const stickyHeader1 = ""
+//const stickyHeader1 = stickyMenu && "shadow";
   return (
     <header
-      className={`fixed left-0 top-0 w-full z-9999 bg-white transition-all ease-in-out duration-300 ${
-        stickyMenu && "shadow"
-      }`}
+      className={` left-0 top-0 w-full z-9999 bg-white transition-all ease-in-out duration-300 
+       ${stickyHeader1}`} 
     >
       <div className="max-w-[1170px] mx-auto px-4 sm:px-7.5 xl:px-0">
         {/* <!-- header top start --> */}
         <div
-          className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 ${
-            stickyMenu ? "py-4" : "py-6"
-          }`}
+          className={`flex flex-col lg:flex-row gap-5 items-end lg:items-center xl:justify-between ease-out duration-200 
+           ${stickyHeader}`}
         >
           {/* <!-- header top left --> */}
           <div className="xl:w-auto flex-col sm:flex-row w-full flex sm:justify-between sm:items-center gap-5 sm:gap-10">
@@ -220,14 +220,14 @@ const Header = () => {
 
                 {
                   user ? (
-                    <div className="flex items-center gap-4>">
+                    <div className="flex items-center gap-6>">
                       <span className="font-medium text-dark">
                         Welcome, {user.firstname}
                       </span>
 
                       <button
                         onClick={logout}
-                        className="bg-white-500 text-red px-5 py-2 rounded-md"
+                        className="flex items-center justify-center text-red bg-white p-3 rounded-md hover:bg-red"
                         //className="w-medium flex justify-center font-medium text-white bg-red py-3 px-6 rounded-md ease-out duration-200 hover:bg-white mt-7.5"
                         >Logout
                       </button>
@@ -236,15 +236,17 @@ const Header = () => {
                     <div className="flex items-center gap-4>">
                       <button
                   onClick={openLoginModal}
-                  className="w-full flex justify-center font-medium text-white bg-green py-3 px-6 rounded-md ease-out duration-200 hover:bg-white mt-7.5"
+                  className="flex items-center justify-center text-white bg-blue p-3 rounded-md hover:bg-green"
                 >
+                  <LogIn size={22} />
                   Login
                 </button>
 
                 <button
                 onClick={openSignupModal}
-                  className="w-full flex justify-center font-medium text-white bg-blue py-3 px-6 rounded-md ease-out duration-200 hover:bg-white mt-7.5"
+                  className="flex items-center justify-center text-white bg-blue p-3 rounded-md hover:bg-green"
                 >
+                  <Store size={22} />
                   Create Shop
                 </button>
                 </div>

@@ -1,4 +1,5 @@
 import db from "../config/db.js";
+import cloudinary from "../config/cloudinary.js";
 
 const formatProduct = (products) => {
 
@@ -165,109 +166,49 @@ export const getProductsByCategory = async (req, res) => {
 /* ---------------- CREATE PRODUCT API ---------------- */
 
 export const addProduct = async (req, res) => {
-
     try {
-
         const shopowner_id = req.user.id;
-
-
-        const {
-            title,
-            price,
-            discountedPrice,
-            quantity,
-            description,
-            category_id,
-            location,
-            condition_type
-        } = req.body;
-
+        const {title,price,discountedPrice,quantity,description,category_id,location,condition_type} = req.body;
 
         const thumbnailFiles = req.files?.thumbnail || [];
-
         const previewFiles = req.files?.preview || [];
 
+        const thumbnailUrls = [];
+        for (const file of thumbnailFiles) {
+            const result = await cloudinary.uploader.upload(file.path,{folder: "easymarket/products"});
+            thumbnailUrls.push(result.secure_url);
+        } 
 
-        const thumbnailUrls = thumbnailFiles.map(
-            file => `/uploads/${file.filename}`
-        );
-
-
-        const previewUrls = previewFiles.map(
-            file => `/uploads/${file.filename}`
-        );
-
+        const previewUrls = [];
+        for (const file of previewFiles) {
+            const result = await cloudinary.uploader.upload(file.path,{folder: "easymarket/products"});
+            previewUrls.push(result.secure_url);
+        } 
 
         const safeThumbnail = JSON.stringify(thumbnailUrls);
-
         const safePreview = JSON.stringify(previewUrls);
 
-
-
-        const result = await db.query(
-
-            `
-            INSERT INTO products
+        const result = await db.query(`INSERT INTO products
             (
-                title,
-                price,
-                discounted_price,
-                quantity,
-                description,
-                thumbnail,
-                preview,
-                shopowner_id,
-                category_id,
-                location,
-                condition_type
+            title,price,discounted_price,quantity,description,thumbnail,preview,shopowner_id,category_id,location,condition_type
             )
-
             VALUES
             (
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
             )
-
             RETURNING id
             `,
-
             [
-                title,
-                Number(price),
-                Number(discountedPrice),
-                Number(quantity),
-                description,
-                safeThumbnail,
-                safePreview,
-                shopowner_id,
-                category_id,
-                location,
-                condition_type
+                title,Number(price),Number(discountedPrice),Number(quantity),description,safeThumbnail,safePreview,shopowner_id,category_id,location,condition_type
             ]
-
         );
-
-
-        res.status(201).json({
-
-            message:"Product created successfully",
-
-            id: result.rows[0].id
-
-        });
-
-
-
+        res.status(201).json({message:"Product created successfully",id: result.rows[0].id});
     } catch(error){
-
         console.error(error);
-
-        res.status(500).json({
-            error:"Server error"
-        });
-
+        res.status(500).json({error:"Server error"});
     }
-
 };
+
 /* ---------------- DELETE PRODUCT API ---------------- */
 
 export const deleteProduct = async (req,res)=>{
@@ -322,141 +263,51 @@ export const deleteProduct = async (req,res)=>{
   /* ---------------- UPDATE PRODUCT API ---------------- */
 
 export const updateProduct = async(req,res)=>{
-
     try{
-
         const {id}=req.params;
+        const {title,price,discountedPrice,quantity,description,category_id,location,condition_type}=req.body;
+        const oldProduct = await db.query("SELECT * FROM products WHERE id=$1",[id]);
 
-
-        const {
-            title,
-            price,
-            discountedPrice,
-            quantity,
-            description,
-            category_id,
-            location,
-            condition_type
-        }=req.body;
-
-
-
-        const oldProduct = await db.query(
-
-            "SELECT * FROM products WHERE id=$1",
-
-            [id]
-
-        );
-
-
-        if(oldProduct.rows.length===0){
-
-            return res.status(404).json({
-                error:"Product not found"
-            });
-
-        }
-
-
+        if(oldProduct.rows.length===0){return res.status(404).json({error:"Product not found"});}
 
         let thumbnail = oldProduct.rows[0].thumbnail;
-
         let preview = oldProduct.rows[0].preview;
 
-
-
         if(req.files?.thumbnail){
-
-            thumbnail = JSON.stringify(
-
-                req.files.thumbnail.map(
-                    file=>`/uploads/${file.filename}`
-                )
-
-            );
-
+            thumbnailUrls = [];
+            for (const file of req.files.thumbnail) {
+                const result = await cloudinary.uploader.upload(file.path, {folder: "easymarket/products"});
+                thumbnailUrls.push(result.secure_url);
+            }
+            thumbnail = JSON.stringify(thumbnailUrls);
         }
-
-
 
         if(req.files?.preview){
-
-            preview = JSON.stringify(
-
-                req.files.preview.map(
-                    file=>`/uploads/${file.filename}`
-                )
-
-            );
-
+            previewUrls = [];
+            for (const file of req.files.preview) {
+                const result = await cloudinary.uploader.upload(file.path, {folder: "easymarket/products"});
+                previewUrls.push(result.secure_url);
+            }
+            preview = JSON.stringify(previewUrls);
         }
-
-
-
-        const result = await db.query(
-
-            `
-            UPDATE products
-
-            SET
-            title=$1,
-            price=$2,
-            discounted_price=$3,
-            quantity=$4,
-            description=$5,
-            thumbnail=$6,
-            preview=$7,
-            category_id=$8,
-            location=$9,
-            condition_type=$10
-
+        
+        if(req.files?.preview){
+            preview = JSON.stringify(req.files.preview.map(file=>`/uploads/${file.filename}`));
+        }
+        const result = await db.query(`UPDATE products
+            SET title=$1,price=$2,discounted_price=$3,quantity=$4,description=$5,thumbnail=$6,preview=$7,category_id=$8,location=$9,condition_type=$10
             WHERE id=$11
-
             RETURNING id
             `,
-
-
             [
-
-                title,
-                Number(price),
-                Number(discountedPrice),
-                Number(quantity),
-                description,
-                thumbnail,
-                preview,
-                category_id,
-                location,
-                condition_type,
-                id
-
+                title,Number(price),Number(discountedPrice),Number(quantity),description,thumbnail,preview,category_id,location,condition_type,id
             ]
-
         );
-
-
-
-        res.json({
-
-            message:"Product updated successfully",
-
-            id:result.rows[0].id
-
-        });
-
-
-
+        res.json({message:"Product updated successfully",id:result.rows[0].id});
     }catch(error){
-
         console.error(error);
-
-        res.status(500).json({
-            error:"Server error"
-        });
-
+        res.status(500).json({error:"Server error"});
     }
-
 };
 
   // NEW ARRIVALS
