@@ -12,20 +12,16 @@ export const register = async (req, res) => {
 try {
   const {firstName,lastName,email,address,phone,shop_name,shop_category_id, password} = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-
   //check if shopowner already exist
   const existingOwner = await db.query("SELECT * FROM shopowners WHERE email = $1", [email]);
   if (existingOwner.rows.length > 0) {return res.status(400).json({message: "Email already exist"})}
-
   const imageFiles = req.files?.image || [];
   const imageUrls = [];
-  for (const file of imageUrls) {
+  for (const file of imageFiles) {
     const result = await cloudinary.uploader.upload(file.path, {folder: "easymarket/shopowners"});
     imageUrls.push(result.secure_url);
   } 
-  
   const safeImage = JSON.stringify(imageUrls);
-
   const paymentDeadline = new Date(Date.now() + 24*60*60*1000);
   const result = await db.query(
     `
@@ -39,7 +35,6 @@ try {
     `,[
       firstName,lastName,email,address,Number(phone),shop_name,shop_category_id,hashedPassword,safeImage,"pending",false,paymentDeadline
     ]);
-    
     try {
       await sendPaymentEmail(email, firstName, paymentDeadline);
     } catch(error) {
@@ -49,8 +44,6 @@ try {
           id: result.rows[0].id,
           message: "Shop owner created successfully. Check your email for payment instructions.",
         });
-
-
       } catch (error) {
         console.error(error);
         res.status(500).json({error: "server error"});
