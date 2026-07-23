@@ -2,6 +2,7 @@ import db from "../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sendPaymentEmail from "../utils/sendPaymentEmail.js";
+import cloudinary from "../config/cloudinary.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -17,7 +18,12 @@ try {
   if (existingOwner.rows.length > 0) {return res.status(400).json({message: "Email already exist"})}
 
   const imageFiles = req.files?.image || [];
-  const imageUrls = imageFiles.map((file) => `/uploads/${file.filename}`);
+  const imageUrls = [];
+  for (const file of imageUrls) {
+    const result = await cloudinary.uploader.upload(file.path, {folder: "easymarket/shopowners"});
+    imageUrls.push(result.secure_url);
+  } 
+  
   const safeImage = JSON.stringify(imageUrls);
 
   const paymentDeadline = new Date(Date.now() + 24*60*60*1000);
@@ -34,11 +40,17 @@ try {
       firstName,lastName,email,address,Number(phone),shop_name,shop_category_id,hashedPassword,safeImage,"pending",false,paymentDeadline
     ]);
     
-    await sendPaymentEmail(email, firstName, paymentDeadline);
+    try {
+      await sendPaymentEmail(email, firstName, paymentDeadline);
+    } catch(error) {
+      console.error("Email notification failed:", error);
+    }
         return res.status(201).json({
           id: result.rows[0].id,
           message: "Shop owner created successfully. Check your email for payment instructions.",
         });
+
+
       } catch (error) {
         console.error(error);
         res.status(500).json({error: "server error"});

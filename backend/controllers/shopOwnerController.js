@@ -5,74 +5,36 @@ import db from "../config/db.js";
 /* GET SHOP OWNERS */
 
 export const getShopOwners = async (req, res) => {
-
     try {
-
-        const result = await db.query(
-            `
-            SELECT 
-                s.id,
-                s.shop_name,
-                s.address,
-                s.image,
-                c.name AS category_name
-
+        const result = await db.query( `SELECT s.id,s.shop_name,s.address,s.image,c.name AS category_name
             FROM shopowners s
-
             LEFT JOIN categories c 
             ON s.shop_category_id = c.id
-
             WHERE s.status = 'active'
-            `
+          `
         );
-
-
-
         const formatted = result.rows.map((shop) => {
-
             let image = [];
-
-
             try {
-
                 image = typeof shop.image === "string"
                     ? JSON.parse(shop.image)
                     : [];
 
             } catch {
-
                 image = [];
-
             }
-
-
-
             return {
-
                 id: shop.id,
-
                 shop_name: shop.shop_name,
-
                 address: shop.address,
-
                 image,
-
                 category_name: shop.category_name
-
             };
 
         });
-
-
-
         res.json(formatted);
-
-
-
     } catch(error) {
-
         console.error(error);
-
         res.status(500).json({
             error:"Database error"
         });
