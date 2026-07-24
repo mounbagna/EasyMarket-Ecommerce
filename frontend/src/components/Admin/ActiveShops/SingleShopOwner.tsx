@@ -59,7 +59,7 @@ const SingleShopOwner = () => {
       </div>
 
       <div className="min-w-[200px]">
-        <p className="text-dark">{shop.registration_paid}</p>
+        <p className="text-dark">{shop.registration_paid ? "Paid" : "Not Paid"}</p>
       </div>
 
       <div className="min-w-[200px]">

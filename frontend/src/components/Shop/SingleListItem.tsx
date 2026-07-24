@@ -55,26 +55,18 @@ const SingleListItem = ({ item,showOwnerAction = true }: Props) => {
       toast.success("Deleted Successfully");
   }
 
-  const images = Array.isArray(item.preview)
-  ? item.preview
-  : typeof item.preview === "string"
-  ? JSON.parse(item.preview || "[]")
-  : [];
-
   return (
     <div className="group rounded-lg bg-white shadow-1">
       <div className="flex">
         <div className="shadow-list relative overflow-hidden flex items-center justify-center max-w-[270px] w-full sm:min-h-[270px] p-4">
-          {images?.length > 0 ? (
-                  images.map((img: string, key:number) => (
+          {item.thumbnail && item.thumbnail.length > 0 ? (
                     <img
-                    key={key}
-                      src={getImageUrl(img)}
+                      src={getImageUrl(item.thumbnail[0])}
                       width={250}
                       height={250}
                       alt={item.title}
                     />
-                  ))) : (
+                  ) : (
                     <Image
                       src="/images/404.svg"
                       width={250}
@@ -153,7 +145,8 @@ const SingleListItem = ({ item,showOwnerAction = true }: Props) => {
             </span>
           </div>
           <p className="text-custom-sm">{item.location}</p>
-          <div className="flex items-center gap-2.5 mb-2">
+
+          {/*<div className="flex items-center gap-2.5 mb-2">
             <div className="flex items-center gap-1">
               
               <Image
@@ -188,7 +181,8 @@ const SingleListItem = ({ item,showOwnerAction = true }: Props) => {
               />
             </div>
             <p className="text-custom-sm">({item.reviews} reviews)</p>
-          </div>
+          </div>*/}
+
           <div className="flex items-center gap-1 text-xs font-medium">
         {item.condition_type === "second_hand" ? (
           <>

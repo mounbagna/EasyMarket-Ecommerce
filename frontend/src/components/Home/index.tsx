@@ -4,6 +4,7 @@ import NewArrival from "./NewArrivals";
 import Shops from "./Shops";
 import Subscription from "../Subscription";
 import SecondHand from "./SecondHand";
+import FeedbackForm from "../Feedback/Feedback";
 
 const Home = () => {
   return (
@@ -14,6 +15,7 @@ const Home = () => {
       <NewArrival />
       <Subscription />
       <SecondHand />
+      <FeedbackForm />
     </main>
   );
 };

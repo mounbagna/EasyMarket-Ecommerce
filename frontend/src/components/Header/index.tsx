@@ -49,7 +49,7 @@ const Header = () => {
     router.push(`/search?q=${encodeURIComponent(searchInput)}`)
   }
   //useEffect(() => {window.addEventListener("scroll", handleStickyMenu);});
-const stickyHeader = "";
+const stickyHeader = ""; 
 //const stickyHeader = stickyMenu ? "py-4" : "py-6";
 const stickyHeader1 = ""
 //const stickyHeader1 = stickyMenu && "shadow";

@@ -8,6 +8,7 @@ import productRoutes from "./routes/productRoutes.js";
 import shopOwnerRoutes from "./routes/shopOwnerRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ app.use("/products", productRoutes);
 app.use("/shop", shopOwnerRoutes);
 app.use("/admin", adminRoutes);
 app.use("/categories", categoryRoutes);
+app.use("/feedback", feedbackRoutes);
 
 
 app.listen(5000, () => {

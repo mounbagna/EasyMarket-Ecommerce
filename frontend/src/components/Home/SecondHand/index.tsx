@@ -69,7 +69,7 @@ const SecondHand = () => {
           </div>
 
           <Link
-            href="#"
+            href="/second-hand-list"
             className="inline-flex font-medium text-custom-sm py-2.5 px-7 rounded-md border-gray-3 border bg-gray-1 text-dark ease-out duration-200 hover:bg-dark hover:text-white hover:border-transparent"
           >
             View All
@@ -78,7 +78,7 @@ const SecondHand = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-7.5 gap-y-9">
           {/* <!-- Second Hand item --> */}
-          {filteredProducts.map((item) => (
+          {filteredProducts.slice(0, 3).map((item) => (
             <ProductItem key={item.id} item={item}  />
           ))}
         </div>

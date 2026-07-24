@@ -31,7 +31,7 @@ const SingleShopOwner = () => {
                 window.location.reload();
               }, 2000)*/
               await loadShops();
-            } else {
+            } else { 
               toast.success("Activation failed!")
             }
           } catch(error){

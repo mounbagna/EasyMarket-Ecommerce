@@ -1,5 +1,4 @@
 import { Category } from "@/types/category";
-import Image from "next/image";
 
 const SingleItem = ({ item }: { item: Category }) => {
   return (

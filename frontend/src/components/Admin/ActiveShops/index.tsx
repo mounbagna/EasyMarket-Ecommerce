@@ -5,7 +5,7 @@ const ActiveShops = () => {
 
   return (
 
-        <section className="overflow-hidden py-20 bg-gray-2">
+        <section className="overflow-hidden py-8 bg-gray-2">
           <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
             <div className="flex flex-wrap items-center justify-between gap-5 mt-10">
               <h2 className="font-medium text-dark text-2xl mb-8">Active Shops</h2>

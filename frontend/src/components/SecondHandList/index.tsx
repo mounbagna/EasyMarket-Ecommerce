@@ -1,59 +1,58 @@
 "use client";
-import {useEffect, useState } from "react";
-import Breadcrumb from "@/components/Common/Breadcrumb";
+import React, { useState, useEffect } from "react";
+import Breadcrumb from "../Common/Breadcrumb";
 
-import SingleGridItem from "@/components/Shop/SingleGridItem";
-import SingleListItem from "@/components/Shop/SingleListItem";
-
-import { Product } from "@/types/product";
-import { useAddItemModalContext } from "@/context/AddItemModalContext";
-import {useAuth} from "@/context/AuthContext";
-import { PackagePlus } from "lucide-react";
+import SingleGridItem from "../Shop/SingleGridItem";
+import SingleListItem from "../Shop/SingleListItem";
+import { Product } from "@/types/product"; 
 import { useSearch } from "@/context/searchContext";
 
 
-type Props = {
-    shopOwnerId: number;
-}
-
-const ShopOwnerContent = ({shopOwnerId}: Props) => {
-  const {user} = useAuth();
+const ListOfItems = () => {
   const {search} = useSearch();
 
   const [productStyle, setProductStyle] = useState("grid");
-  const { openAddItemModal } = useAddItemModalContext();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   const filteredProducts = products.filter((product => product.title.toLowerCase().includes(search.toLowerCase())));
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/second-hand`);
   
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop/${shopOwnerId}/products`);
-      if (!res.ok) throw new Error("Server error");
-
-      const data = await res.json();
-
-      setProducts(data)
-
-    } catch (err) {
-      console.error("Error fetching products:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-useEffect(() => {
-  if (shopOwnerId) {fetchProducts();}
-}, [shopOwnerId]);
+        if (!res.ok) throw new Error("Server error");
+  
+        const text = await res.text();
+  
+        let data = [];
+  
+        try {
+          data = JSON.parse(text);
+        } catch {
+          console.error("Backend did NOT return JSON:", text);
+          data = [];
+        }
+  
+        setProducts(data);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchProducts();
+  }, []);
 
   return (
     <>
       <Breadcrumb
-        title={"Explore All Products"}
-        pages={["shop", "/", "Shop owner's items"]}
+        title={"Explore All Second Hand Products"}
+        pages={["shop", "/", "second hand"]}
       />
-      <section className="overflow-hidden relative pb-20 pt-0 lg:pt-0 xl:pt-5 bg-[#f3f4f6]">
+      <section className="overflow-hidden relative pb-20 pt-5 lg:pt-20 xl:pt-28 bg-[#f3f4f6]">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
           <div className="flex gap-7.5">
             {/* // <!-- Content Start --> */}
@@ -136,20 +135,7 @@ useEffect(() => {
                           fill=""
                         />
                       </svg>
-                      
                     </button>
-                    {
-                      user &&
-                      user.id === shopOwnerId && (
-                        <button
-                        onClick={() => {
-                          openAddItemModal();
-                        }}
-                        className="inline-flex items-center gap-2 font-medium text-sm py-2 px-5 rounded-lg bg-gray text-green hover:bg-blue transition"
-                        ><PackagePlus size={30} /></button>
-                      )
-                    }
-                    
                   </div>
                 </div>
               </div>
@@ -162,14 +148,16 @@ useEffect(() => {
                     : "flex flex-col gap-7.5"
                 }`}
               >
-                {filteredProducts.map((item) => {
-                return productStyle === "grid" ? (
-                <SingleGridItem item={item} key={item.id} />
-               ) : (
-                <SingleListItem item={item} key={item.id} /> 
-              )
-              })}
-              </div>
+                {filteredProducts.map((item, key) =>
+                  productStyle === "grid" ? (
+                    <SingleGridItem item={item} key={key} showOwnerAction={false}/>
+                  ) : ( 
+                    <SingleListItem item={item} key={key} showOwnerAction={false}/>
+                  )
+                )}
+              </div> 
+              {/* <!-- Products Grid Tab Content End --> */}
+
               </div>
             {/* // <!-- Content End --> */}
           </div>
@@ -179,4 +167,4 @@ useEffect(() => {
   );
 };
 
-export default ShopOwnerContent;
+export default ListOfItems;

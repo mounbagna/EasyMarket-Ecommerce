@@ -38,7 +38,7 @@ const NewArrival = () => {
     return <p>Loading products...</p>
   }
   return (
-    <section className="overflow-hidden pt-15">
+    <section className="overflow-hidden pt-10">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
         {/* <!-- section title --> */}
         <div className="mb-7 flex items-center justify-between">

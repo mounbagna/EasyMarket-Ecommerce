@@ -12,7 +12,7 @@ const SingleShopOwner = () => {
                 Authorization: `Bearer ${token}`,
             },
         }).then(res=>res.json()).then(data=>{
-          setShops(Array.isArray(data)?data:[]);})
+          setShops(Array.isArray(data)?data:[]);}) 
     }
 
     useEffect(() => {
@@ -63,7 +63,7 @@ const SingleShopOwner = () => {
       </div>
 
       <div className="min-w-[200px]">
-        <p className="text-dark">{shop.monthly_paid_until}</p>
+        <p className="text-dark">{shop.monthly_paid_until}</p> 
       </div>
 
       <div className="min-w-[200px]">

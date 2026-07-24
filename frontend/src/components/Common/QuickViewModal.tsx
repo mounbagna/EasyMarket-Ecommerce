@@ -39,6 +39,9 @@ const QuickViewModal = () => {
   };
 
   useEffect(() => {
+    setActivePreview(0);
+  },[product])
+  useEffect(() => {
     // closing modal while clicking outside
     function handleClickOutside(event) {
       if (!event.target.closest(".modal-content")) {
@@ -92,7 +95,7 @@ const QuickViewModal = () => {
             <div className="max-w-[526px] w-full">
               <div className="flex gap-5">
                 <div className="flex flex-col gap-5">
-                  {thumbnails.slice(0,2).map((img, index) => (
+                  {product?.thumbnail?.map((img, index) => (
                     <button
                       onClick={() => setActivePreview(index)}
                       key={index}
@@ -136,7 +139,7 @@ const QuickViewModal = () => {
 
                     {product?.preview?.[activePreview] && (
                       <img
-                        src={getImageUrl(product.preview[activePreview])}
+                        src={getImageUrl(product?.preview?.[activePreview])}
                         alt="products-details"
                         width={400}
                         height={400}
@@ -157,8 +160,8 @@ const QuickViewModal = () => {
               </h3>
 
               <div className="flex flex-wrap items-center gap-5 mb-6">
-                <div className="flex items-center gap-1.5">
-                  {/* <!-- stars --> */}
+                {/* <!-- stars --> */}
+                {/*<div className="flex items-center gap-1.5">
                   <div className="flex items-center gap-1">
                     <svg
                       className="fill-[#FFA645]"
@@ -269,7 +272,7 @@ const QuickViewModal = () => {
                   <span>
                     <span className="font-medium text-dark"> 3 Rating </span>
                   </span>
-                </div>
+                </div>*/}
 
                 <div className="flex items-center gap-2">
                   <svg
@@ -300,10 +303,7 @@ const QuickViewModal = () => {
                 </div>
               </div>
 
-              <p>
-                These products are imported from various countries such as Turkey, Dubai,
-                China, Bangladesh and India. They are the best best quality products in the market.
-              </p>
+              <p>{product?.description} </p>
 
               <div className="flex flex-wrap justify-between gap-5 mt-6 mb-7.5">
                 <div>

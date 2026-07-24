@@ -52,28 +52,19 @@ const SingleGridItem = ({ item,showOwnerAction = true }: Props) => {
       toast.success("Deleted Successfully");
   }
 
-  const images = Array.isArray(item.preview)
-  ? item.preview
-  : typeof item.preview === "string"
-  ? JSON.parse(item.preview || "[]")
-  : [];
-
-
   return (
     <div className="group">
       {/* IMAGE */}
-      <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-white shadow-1 min-h-[270px] mb-4">
+      <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-white shadow-1 min-h-[270px] mb-2">
 
-        {images?.length > 0 ? (
-        images.map((img: string, key:number) => (
+        {item.thumbnail && item.thumbnail.length > 0 ? (
           <img
-          key={key}
-            src={getImageUrl(img)}
+            src={getImageUrl(item.thumbnail[0])}
             width={250}
             height={250}
             alt={item.title}
           />
-        ))) : (
+        ) : (
           <Image
             src="/images/404.svg"
             width={250}
@@ -144,8 +135,9 @@ const SingleGridItem = ({ item,showOwnerAction = true }: Props) => {
         </div>
       </div>
       <p className="text-custom-sm">{item.location}</p>
+
       {/* REVIEWS */}
-      <div className="flex items-center gap-2.5 mb-2">
+      {/*<div className="flex items-center gap-2.5 mb-2">
         <div className="flex items-center gap-1">
           <Image src="/images/icons/icon-star.svg" alt="star" width={15} height={15} />
           <Image src="/images/icons/icon-star.svg" alt="star" width={15} height={15} />
@@ -155,8 +147,8 @@ const SingleGridItem = ({ item,showOwnerAction = true }: Props) => {
         </div>
 
         <p className="text-custom-sm">(reviews)</p>
-       {/* <p className="text-custom-sm">({item.reviews})</p>*/}
-      </div>
+       <p className="text-custom-sm">({item.reviews})</p>
+      </div>*/}
       
       {/* TITLE */}
       <h3 className="font-medium text-dark mb-1.5 hover:text-blue">

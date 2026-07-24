@@ -197,7 +197,8 @@ const AddItemModal = () => {
           <option value="second_hand">Second Hand</option>
           </select>
 
-          {/* THUMBNAIL */}
+          {/*THUMBNAIL */}
+          <label className="mt-10 text-xl font-bold text-center mb-6" htmlFor="thumbnail">Upload 4 thumnail & preview images respectively</label>
           <input
             type="file"
             multiple

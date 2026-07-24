@@ -217,7 +217,7 @@ export const activateShopOwner = async (req,res) => {
         const owner = updateResult.rows[0];         
             
             //send Activation email
-            transporter.sendMail({
+            await sendPaymentMail({
                 from: process.env.EMAIL_USER,
                 to: owner.email,
                 subject: "EasyMarket shop activated",

@@ -84,6 +84,7 @@ const ProductItem = ({ item }: { item: Product }) => {
           
         </div>
       </div>
+{/*
       <p className="text-custom-sm">{item.location}</p>
       <div className="flex items-center gap-2.5 mb-2">
         <div className="flex items-center gap-1">
@@ -93,10 +94,9 @@ const ProductItem = ({ item }: { item: Product }) => {
           <Image src="/images/icons/icon-star.svg" alt="star icon" width={14} height={14}/>
           <Image src="/images/icons/icon-star.svg" alt="star icon" width={14} height={14}/>
         </div>
-
         <p className="text-custom-sm">({item.reviews} reviews)</p>
-        
       </div>
+      */}
       <div className="flex items-center gap-1 text-xs font-medium">
         {item.condition_type === "second_hand" ? (
           <>

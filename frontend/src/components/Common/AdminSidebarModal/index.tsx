@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAdminSidebarContext } from "@/context/AdminSidebarModalContext";
@@ -131,7 +131,7 @@ const AdminSidebarModal = () => {
                 </nav>
             </div>
 
-            <div className="flex items-center gap-4 mt-110">
+            <div className="flex items-center gap-4 mt-90">
               <div className="absolute bottom-0 w-full p-4 border-t border-gray-700">
                 <button onClick={logout} className="flex items-center gap-4 px-4 rounded-lg hover:bg-red transition">
                     <LogOut size={20}/> Logout

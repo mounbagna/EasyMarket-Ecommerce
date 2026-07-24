@@ -268,13 +268,13 @@ export const updateProduct = async(req,res)=>{
         const {title,price,discountedPrice,quantity,description,category_id,location,condition_type}=req.body;
         const oldProduct = await db.query("SELECT * FROM products WHERE id=$1",[id]);
 
-        if(oldProduct.rows.length===0){return res.status(404).json({error:"Product not found"});}
+        if(oldProduct.rows.length === 0){return res.status(404).json({error:"Product not found"});}
 
         let thumbnail = oldProduct.rows[0].thumbnail;
         let preview = oldProduct.rows[0].preview;
 
         if(req.files?.thumbnail){
-            thumbnailUrls = [];
+            const thumbnailUrls = [];
             for (const file of req.files.thumbnail) {
                 const result = await cloudinary.uploader.upload(file.path, {folder: "easymarket/products"});
                 thumbnailUrls.push(result.secure_url);
@@ -282,19 +282,8 @@ export const updateProduct = async(req,res)=>{
             thumbnail = JSON.stringify(thumbnailUrls);
         }
 
-        if(req.files?.preview){
-            previewUrls = [];
-            for (const file of req.files.preview) {
-                const result = await cloudinary.uploader.upload(file.path, {folder: "easymarket/products"});
-                previewUrls.push(result.secure_url);
-            }
-            preview = JSON.stringify(previewUrls);
-        }
-        
-        if(req.files?.preview){
-            preview = JSON.stringify(req.files.preview.map(file=>`/uploads/${file.filename}`));
-        }
-        const result = await db.query(`UPDATE products
+        const result = await db.query(`
+            UPDATE products
             SET title=$1,price=$2,discounted_price=$3,quantity=$4,description=$5,thumbnail=$6,preview=$7,category_id=$8,location=$9,condition_type=$10
             WHERE id=$11
             RETURNING id
@@ -303,7 +292,7 @@ export const updateProduct = async(req,res)=>{
                 title,Number(price),Number(discountedPrice),Number(quantity),description,thumbnail,preview,category_id,location,condition_type,id
             ]
         );
-        res.json({message:"Product updated successfully",id:result.rows[0].id});
+        return res.json({message:"Product updated successfully",id:result.rows[0].id});
     }catch(error){
         console.error(error);
         res.status(500).json({error:"Server error"});
